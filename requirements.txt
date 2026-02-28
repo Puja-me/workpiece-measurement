@@ -3,6 +3,6 @@ opencv-python-headless
 numpy
 scipy
 scikit-image
-rembg
+rembg[cpu]
 pillow
 gunicorn
