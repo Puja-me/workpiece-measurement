@@ -307,6 +307,11 @@ RedQueueDisc::SetAredAlpha(double alpha)
     NS_LOG_FUNCTION(this << alpha);
     m_aredAlpha = alpha;
 
+    /* 
+    * alpha <= 0.01  
+    * [Ref: https://www.icir.org/floyd/papers/adaptiveRed.pdf] Section - 4.2
+    */
+
     if (m_aredAlpha > 0.01)
     {
         NS_LOG_WARN("Alpha value is above the recommended bound!");
@@ -326,6 +331,10 @@ RedQueueDisc::SetAredBeta(double beta)
     NS_LOG_FUNCTION(this << beta);
     m_aredBeta = beta;
 
+    /* 
+    * beta  >= 0.83 
+    * [Ref: https://www.icir.org/floyd/papers/adaptiveRed.pdf] Section - 4.2
+    */
     if (m_aredBeta < 0.83)
     {
         NS_LOG_WARN("Beta value is below the recommended bound!");
@@ -349,6 +358,10 @@ RedQueueDisc::SetFengAdaptiveA(double a)
     NS_LOG_FUNCTION(this << a);
     m_fengAlpha = a;
 
+    /* 
+    * fengAlpha is set to 3
+    * [Ref: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=752150] Section - IV
+    */
     if (m_fengAlpha != 3)
     {
         NS_LOG_WARN("Alpha value does not follow the recommendations!");
@@ -368,6 +381,10 @@ RedQueueDisc::SetFengAdaptiveB(double b)
     NS_LOG_FUNCTION(this << b);
     m_fengBeta = b;
 
+    /* 
+    * fengBeta is set to 2
+    * [Ref: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=752150] Section - IV
+    */
     if (m_fengBeta != 2)
     {
         NS_LOG_WARN("Beta value does not follow the recommendations!");
@@ -607,8 +624,10 @@ RedQueueDisc::InitializeParams()
     {
         m_minTh = 5.0;
 
-        /* set m_minTh to max(m_minTh, targetQueue/2.0) [Ref: http://www.icir.org/floyd/papers/adaptiveRed.pdf]
-         * Target queue in packets = targetQueueDelay * ptc
+        /* 
+        * set m_minTh to max(m_minTh, targetQueue/2.0)
+        * [Ref: http://www.icir.org/floyd/papers/adaptiveRed.pdf] Section - 6
+        * Target queue in packets = targetQueueDelay * ptc
         */
         double targetQueue = m_targetQueueDelay.GetSeconds() * m_ptc;
 
@@ -623,8 +642,10 @@ RedQueueDisc::InitializeParams()
             m_minTh = m_minTh * m_meanPktSize;
         }
 
-        // set m_maxTh to three times m_minTh [Ref:http://www.icir.org/floyd/papers/adaptiveRed.pdf]
-        
+        /* 
+        * set m_maxTh to three times m_minTh
+        * [Ref: http://www.icir.org/floyd/papers/adaptiveRed.pdf] Section - 6
+        */
         m_maxTh = 3 * m_minTh;
     }
 
@@ -940,6 +961,10 @@ RedQueueDisc::CalculatePNew()
         if (m_isNonlinear)
         {
             Pd *= Pd * 1.5;
+        /* 
+        * set Pd in Non-linear RED to 1.5*Pd
+        * [Ref: https://www.sciencedirect.com/science/article/pii/S1389128606000879?via%3Dihub] Section - 3.1
+        */    
         }
 
         Pd *= m_curMaxP;
